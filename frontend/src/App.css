@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container {
+  @apply max-w-3xl mx-auto p-5;
+}
+
+.navbar {
+  @apply bg-gray-800 p-2;
+}
+
+.navbar a {
+  @apply text-white mx-4 no-underline;
+}
+
+table {
+  @apply w-full border-collapse mt-5;
+}
+
+th, td {
+  @apply border border-gray-300 p-2 text-left;
+}
+
+th {
+  @apply bg-gray-100;
+}
+
+form {
+  @apply mt-5;
+}
+
+input, select, button {
+  @apply m-1 p-2 border border-gray-300;
+}
+
+button {
+  @apply bg-green-500 text-white border-none cursor-pointer;
+}
