@@ -1,10 +1,11 @@
 // components/MainContent.js
 import { Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import Overview from './Overview';
 import Participants from './Participants';
 import Scoreboard from './Scoreboard';
+import LoadingSpinner from './LoadingSpinner';
+import Footer from './Footer';
 
 const PageTitle = ({ title, subtitle }) => (
   <div className="mb-8">
@@ -15,11 +16,7 @@ const PageTitle = ({ title, subtitle }) => (
   </div>
 );
 
-const LoadingSpinner = () => (
-  <div className="flex justify-center items-center min-h-[400px]">
-    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-  </div>
-);
+
 
 const LoginButton = () => {
   const navigate = useNavigate();
@@ -63,45 +60,47 @@ const Breadcrumbs = () => {
 };
 
 const MainContent = () => {
-  const { user } = useAuth();
 
   return (
-    <main className="flex max-w-full flex-auto flex-col pt-20 lg:pt-0">
-      <div className="container mx-auto space-y-10 px-4 py-8 lg:space-y-16 lg:px-8 lg:py-12 xl:max-w-7xl">
-        <div className="flex justify-between items-center">
-          <Breadcrumbs />
-          <LoginButton />
-        </div>
-        
-        <Suspense fallback={<LoadingSpinner />}>
-          <div className="space-y-10">
-            <section>
-              <PageTitle 
-                title="Competition Dashboard" 
-                subtitle="Welcome to the scoring system"
-              />
-              <Overview />
-            </section>
-
-            <section>
-              <PageTitle 
-                title="Live Scoreboard" 
-                subtitle="Current standings and scores"
-              />
-              <Scoreboard />
-            </section>
-
-            <section>
-              <PageTitle 
-                title="Participants" 
-                subtitle="View all participants"
-              />
-              <Participants />
-            </section>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1 flex max-w-full flex-col pt-20 lg:pt-0">
+        <div className="container mx-auto space-y-10 px-4 py-8 lg:space-y-16 lg:px-8 lg:py-12 xl:max-w-7xl">
+          <div className="flex justify-between items-center">
+            <Breadcrumbs />
+            <LoginButton />
           </div>
-        </Suspense>
-      </div>
-    </main>
+          
+          <Suspense fallback={<LoadingSpinner />}>
+            <div className="space-y-10">
+              <section>
+                <PageTitle 
+                  title="Competition Dashboard" 
+                  subtitle="Welcome to the scoring system"
+                />
+                <Overview />
+              </section>
+
+              <section>
+                <PageTitle 
+                  title="Live Scoreboard" 
+                  subtitle="Current standings and scores"
+                />
+                <Scoreboard />
+              </section>
+
+              <section>
+                <PageTitle 
+                  title="Participants" 
+                  subtitle="View all participants"
+                />
+                <Participants />
+              </section>
+            </div>
+          </Suspense>
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

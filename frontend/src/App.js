@@ -8,9 +8,7 @@ import { ROUTES, ROUTE_PROTECTION } from './constants/routes';
 import AdminPanel from './components/AdminPanel';
 import JudgePortal from './components/JudgePortal';
 import MainContent from './components/MainContent';
-import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
 import Login from './components/Login';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -42,24 +40,24 @@ const Layout = ({ children }) => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {user && (
-        <>
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      <div className="flex flex-1">
+        {user && (
           <Sidebar 
             open={mobileSidebarOpen} 
             onClose={() => setMobileSidebarOpen(false)} 
           />
-          <Header onToggleSidebar={() => setMobileSidebarOpen(true)} />
-        </>
-      )}
-      <main className={`${user ? 'pt-20 lg:pl-64' : ''}`}>
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingSpinner />}>
-            {children}
-          </Suspense>
-        </ErrorBoundary>
-      </main>
-      <Footer />
+        )}
+        <main className={`flex-1 ${user ? 'lg:pl-64' : ''}`}>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <div className="p-4 sm:p-6 lg:p-8">
+                {children}
+              </div>
+            </Suspense>
+          </ErrorBoundary>
+        </main>
+      </div>
     </div>
   );
 };
@@ -91,6 +89,9 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+
+            {/* Default redirect to scoreboard */}
+            <Route path="/" element={<Navigate to={ROUTES.SCOREBOARD.path} replace />} />
 
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />

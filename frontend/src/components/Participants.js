@@ -4,6 +4,54 @@ import axios from 'axios';
 import UserCard from './cards/UserCard';
 import { generateAvatar } from '../utils/avatarUtils';
 
+/**
+ * Participants Component
+ * 
+ * This component displays a list of participants with features such as sorting, searching, and refreshing.
+ * It fetches participant data from an API, processes it, and renders it in a grid layout.
+ * 
+ * State Variables:
+ * - `participants`: Array of participant objects with additional computed properties like avatar, rank, and status.
+ * - `loading`: Boolean indicating whether data is being fetched.
+ * - `error`: String containing error messages, if any.
+ * - `searchTerm`: String used to filter participants by name, email, or registration.
+ * - `sortBy`: Field by which participants are sorted (e.g., "average_score", "name", "total_scores").
+ * - `sortOrder`: Sorting order, either "asc" (ascending) or "desc" (descending).
+ * 
+ * Functions:
+ * - `fetchParticipants`: Fetches participant data from the API, processes it, and updates the state.
+ * - `calculateRank`: Calculates the rank of a participant based on their average score.
+ * - `handleSort`: Toggles sorting order or changes the sorting field.
+ * - `getSortValue`: Retrieves the value of a participant's field for sorting purposes.
+ * 
+ * Effects:
+ * - `useEffect`: Fetches participants on component mount and sets up a 30-second interval for refreshing data.
+ * 
+ * Rendered Elements:
+ * - Header: Displays the title and the number of participants currently shown.
+ * - Controls: Includes sorting dropdown, search input, and a refresh button.
+ * - Error Message: Displays an error message if data fetching fails.
+ * - Participant Grid: Displays participant cards with details like name, score, rank, and status.
+ * - Empty State: Shown when no participants match the search or when the list is empty.
+ * 
+ * Props for `UserCard` Component:
+ * - `avatar`: URL or placeholder for the participant's avatar.
+ * - `name`: Participant's name.
+ * - `email`: Participant's email address.
+ * - `registration`: Participant's registration details.
+ * - `projectName`: A string indicating the participant's current standing.
+ * - `score`: Participant's average score.
+ * - `totalScores`: Total number of scores received by the participant.
+ * - `judgesCount`: Number of judges who scored the participant.
+ * - `lastScored`: Timestamp of the last score received.
+ * - `status`: Status of the participant (e.g., "active" or "pending").
+ * - `onView`: Callback function to navigate to the participant's detailed view.
+ * 
+ * Notes:
+ * - The component handles API responses that may include extraneous messages (e.g., "Connected successfully").
+ * - Sorting supports both numeric and string fields.
+ * - The refresh button is disabled while data is being fetched.
+ */
 const Participants = () => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +66,7 @@ const Participants = () => {
       setError(null);
       setLoading(true);
       
-      const response = await axios.get('http://localhost/scoringsystem/backend/api/get_participants.php');
+      const response = await axios.get('/get_participants.php');
       console.log('Raw API response:', response.data);
   
       // Remove "Connected successfully" messages if present

@@ -11,7 +11,7 @@ const SocialLink = ({ href, icon: Icon, label }) => (
     className="text-slate-400 hover:text-slate-600 transition-colors"
     aria-label={label}
   >
-    <Icon className="size-5" />
+    <Icon className="h-5 w-5" />
   </a>
 );
 
@@ -22,55 +22,60 @@ const Footer = () => {
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    // Handle subscription logic
     console.log('Subscribe:', email);
     setEmail('');
   };
 
   return (
     <footer className="bg-white border-t border-slate-100">
-      <div className="container mx-auto px-4 py-8 lg:px-8 xl:max-w-7xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 lg:px-8 xl:max-w-7xl">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {/* Brand Info */}
-          <div>
-            <h3 className="font-semibold text-slate-800 mb-4">Scoring System</h3>
-            <p className="text-sm text-slate-500 mb-4">
+          <div className="space-y-3">
+            <h3 className="font-semibold text-slate-800 text-lg">Scoring System</h3>
+            <p className="text-sm text-slate-500">
               A modern platform for fair and transparent judging.
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-slate-800 mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-3">
+            <h3 className="font-semibold text-slate-800 text-lg">Quick Links</h3>
+            <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-slate-500 hover:text-blue-600">About</Link>
+                <Link to="/about" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
+                  About
+                </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-slate-500 hover:text-blue-600">Contact</Link>
+                <Link to="/contact" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
+                  Contact
+                </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-slate-500 hover:text-blue-600">Privacy Policy</Link>
+                <Link to="/privacy" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Newsletter */}
-          <div className="lg:col-span-2">
-            <h3 className="font-semibold text-slate-800 mb-4">Stay Updated</h3>
-            <form onSubmit={handleSubscribe} className="flex gap-2">
+          <div className="sm:col-span-2 lg:col-span-2">
+            <h3 className="font-semibold text-slate-800 text-lg mb-3">Stay Updated</h3>
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 required
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
               >
                 Subscribe
               </button>
@@ -80,18 +85,18 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-slate-100 pt-6">
-          <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+          <div className="flex flex-col gap-4 items-center sm:items-start lg:flex-row lg:justify-between lg:items-center">
             {/* Copyright */}
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-center lg:text-left text-slate-500">
               © {year} <span className="font-semibold">Scoring System</span>
-              <span className="mx-2">·</span>
-              <span className="text-slate-400">v{version}</span>
+              <span className="mx-2 hidden sm:inline">·</span>
+              <span className="text-slate-400 block sm:inline">v{version}</span>
             </div>
 
             {/* Credits */}
             <div className="inline-flex items-center justify-center text-sm text-slate-500">
               <span>Crafted with</span>
-              <HeartIcon className="mx-1 text-red-500" />
+              <HeartIcon className="mx-1 text-red-500 h-4 w-4" />
               <span>
                 by{' '}
                 <a
@@ -106,7 +111,7 @@ const Footer = () => {
             </div>
 
             {/* Social Links */}
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-6 sm:gap-4">
               <SocialLink
                 href="https://github.com"
                 icon={({ className }) => (

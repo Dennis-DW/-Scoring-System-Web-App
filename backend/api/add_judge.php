@@ -1,88 +1,137 @@
 <?php
-require '/../config/db_connect.php';
+// api/add_judge.php
+
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: http://localhost:3000');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+require_once __DIR__ . '/../config/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    // Extract and sanitize inputs
-    $username = filter_var($data['username'] ?? '', FILTER_SANITIZE_STRING);
-    $display_name = filter_var($data['display_name'] ?? '', FILTER_SANITIZE_STRING);
-    $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
-    $password = $data['password'] ?? '';
-
-    // Validate inputs
-    $errors = [];
-    if (empty($username)) $errors['username'] = 'Username is required';
-    if (empty($display_name)) $errors['display_name'] = 'Display name is required';
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = 'Valid email is required';
-    }
-    if (empty($password) || strlen($password) < 8) {
-        $errors['password'] = 'Password must be at least 8 characters';
-    }
-
-    if (!empty($errors)) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'errors' => $errors
-        ]);
-        exit;
-    }
-
     try {
-        // Check if username or email already exists
-        $stmt = $pdo->prepare('SELECT id FROM judges WHERE username = ? OR email = ?');
-        $stmt->execute([$username, $email]);
-        if ($stmt->fetch()) {
+        $pdo = connectDB();
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Extract and sanitize inputs
+        $username = filter_var($data['username'] ?? '', FILTER_SANITIZE_STRING);
+        $display_name = filter_var($data['display_name'] ?? '', FILTER_SANITIZE_STRING);
+        $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $password = $data['password'] ?? '';
+        $role_id = filter_var($data['role_id'] ?? 2, FILTER_VALIDATE_INT); // Default to judge role
+
+        // Validate inputs
+        $errors = [];
+        if (empty($username)) $errors['username'] = 'Username is required';
+        if (empty($display_name)) $errors['display_name'] = 'Display name is required';
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Valid email is required';
+        }
+        if (empty($password) || strlen($password) < 8) {
+            $errors['password'] = 'Password must be at least 8 characters';
+        }
+
+        if (!empty($errors)) {
             http_response_code(400);
-            echo json_encode([
-                'success' => false,
-                'error' => 'Username or email already exists'
-            ]);
+            echo json_encode(['success' => false, 'errors' => $errors]);
             exit;
         }
 
-        // Hash password and insert new judge
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        
+        $pdo->beginTransaction();
+
+        // Check if username or email exists
+        $stmt = $pdo->prepare('SELECT id FROM judges WHERE username = ? OR email = ?');
+        $stmt->execute([$username, $email]);
+        if ($stmt->fetch()) {
+            throw new Exception('Username or email already exists', 409);
+        }
+
+        // Verify role exists
+        $stmt = $pdo->prepare('SELECT id FROM roles WHERE id = ?');
+        $stmt->execute([$role_id]);
+        if (!$stmt->fetch()) {
+            throw new Exception('Invalid role', 400);
+        }
+
+        // Insert new judge
         $stmt = $pdo->prepare('
-            INSERT INTO judges (username, display_name, email, password_hash) 
-            VALUES (?, ?, ?, ?)
+            INSERT INTO judges (
+                username, 
+                display_name, 
+                email, 
+                password_hash, 
+                role_id,
+                is_active,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, TRUE, NOW())
         ');
-        $stmt->execute([$username, $display_name, $email, $password_hash]);
+        
+        $stmt->execute([
+            $username,
+            $display_name,
+            $email,
+            password_hash($password, PASSWORD_DEFAULT),
+            $role_id
+        ]);
         
         $newJudgeId = $pdo->lastInsertId();
-        
-        // Fetch the created judge (excluding password)
+
+        // Log to audit trail
         $stmt = $pdo->prepare('
-            SELECT id, username, display_name, email, created_at 
-            FROM judges 
-            WHERE id = ?
+            INSERT INTO audit_trail (
+                table_name,
+                record_id,
+                action,
+                changes
+            ) VALUES (?, ?, ?, ?)
+        ');
+        
+        $stmt->execute([
+            'judges',
+            $newJudgeId,
+            'INSERT',
+            json_encode([
+                'username' => $username,
+                'display_name' => $display_name,
+                'email' => $email,
+                'role_id' => $role_id
+            ])
+        ]);
+
+        // Fetch created judge
+        $stmt = $pdo->prepare('
+            SELECT j.id, j.username, j.display_name, j.email, j.created_at, r.name as role
+            FROM judges j
+            JOIN roles r ON j.role_id = r.id
+            WHERE j.id = ?
         ');
         $stmt->execute([$newJudgeId]);
         $judge = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $pdo->commit();
 
         echo json_encode([
             'success' => true,
             'message' => 'Judge added successfully',
             'judge' => $judge
         ]);
-        
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Database error',
-            'message' => $e->getMessage()
-        ]);
+
     } catch (Exception $e) {
-        http_response_code(500);
+        if ($pdo && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        $code = $e->getCode() ?: 500;
+        http_response_code($code);
         echo json_encode([
             'success' => false,
-            'error' => 'Server error',
-            'message' => $e->getMessage()
+            'error' => $e->getMessage()
         ]);
     }
 }
-?>

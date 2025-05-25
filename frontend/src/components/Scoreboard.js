@@ -2,6 +2,37 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+/**
+ * Scoreboard Component
+ * 
+ * This component displays a public scoreboard with participant rankings, scores, and other details.
+ * It fetches data from the server, supports sorting by average score or total points, 
+ * and updates the scoreboard periodically.
+ * 
+ * State Variables:
+ * - `scores`: Array of score objects fetched from the server.
+ * - `loading`: Boolean indicating whether the data is still being loaded.
+ * - `error`: String containing an error message if the fetch operation fails.
+ * - `sortBy`: Field by which the scores are sorted ('average_score' or 'total_points').
+ * - `sortOrder`: Order of sorting ('asc' for ascending, 'desc' for descending).
+ * 
+ * Effects:
+ * - Fetches scores from the server on component mount and every 5 seconds thereafter.
+ * - Handles errors during the fetch operation and updates the UI accordingly.
+ * 
+ * Sorting:
+ * - Users can toggle sorting by clicking on the column headers for "Average Score" or "Total Points".
+ * - Sorting order toggles between ascending and descending when the same column is clicked repeatedly.
+ * 
+ * Rendered Output:
+ * - Displays a loading spinner while fetching data.
+ * - Shows an error message if the fetch operation fails.
+ * - Renders a table with participant rankings, scores, and other details.
+ * - Highlights participants based on their average score (green for >= 75, blue for >= 50, default otherwise).
+ * - Displays "No scores available yet" if the scores array is empty.
+ * 
+ * @component
+ */
 function Scoreboard() {
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
