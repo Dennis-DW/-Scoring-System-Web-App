@@ -1,73 +1,90 @@
-# Scoring System Web App
 
-A simple, real-time web app for managing competition scores, built with a LAMP stack (Linux, Apache, MySQL/MariaDB, PHP) and a React frontend.
+
+# 🎯 Scoring System Web App
+
+A sleek, real-time web application for managing competition scores, built with a **LAMP stack** (Linux, Apache, MySQL/MariaDB, PHP) and a **React frontend**. Ideal for competitions, tournaments, or events requiring live score tracking.
 
 ---
 
 ## 📝 Overview
 
-This mockup app lets:
+This app enables:
 
-- **Judges** score participants.
-- **Admins** manage judges and view data.
-- **Participants** view the live scoreboard.
+* **Judges** to submit scores for participants.
+* **Admins** to manage judges and view system analytics.
+* **Participants** to monitor a live scoreboard.
 
-Uses a RESTful PHP API, MySQL database, and React frontend for a dynamic UI.
+Built with a **RESTful PHP API**, a **MySQL/MariaDB database**, and a **React frontend** for a dynamic, user-friendly interface.
 
 ---
 
-## 🏗 Architecture
+## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    A[React Frontend] --> B[PHP API]
-    B --> C[MySQL Database]
-    D[Judges] --> A
-    E[Admin] --> A
-    F[Participants] --> A
+    A[React Frontend] -->|API Calls| B[PHP REST API]
+    B -->|Database Queries| C[MySQL/MariaDB Database]
+    D[Judges] -->|Score Submission| A
+    E[Admin] -->|Manage System| A
+    F[Participants] -->|View Scoreboard| A
 ```
 
 ---
 
-
 ## 🧩 Installation
 
+### 🔄 Clone the Repository
+
 ```bash
-# Clone repository
-git clone [repo_url]
+git clone [repository_url]
+```
 
-# Setup database
+### 🛢️ Set Up the Database
+
+```bash
 mysql -u [user] -p [database_name] < backend/database/database.sql
+```
 
-# Install PHP dependencies
+### ⚙️ Install Backend Dependencies
+
+```bash
 cd backend
-[composer_command_placeholder]
+composer install  # If Composer is used
+```
 
-# Install React dependencies
+### ⚛️ Install Frontend Dependencies
+
+```bash
 cd frontend
 npm install
 ```
 
-
-
-
+---
 
 ## ⚙️ Prerequisites
 
-- **LAMP Stack**: Linux, Apache, MySQL/MariaDB, PHP `[version placeholder]`
-- **Node.js**: `[version placeholder]`
-- **Composer**: Optional (not used in this mockup)
+* **LAMP Stack**:
+
+  * Linux OS
+  * Apache Web Server
+  * MySQL/MariaDB
+  * PHP \[version placeholder]
+* **Node.js**: \[version placeholder]
+* **Composer** *(optional, for PHP dependency management)*
 
 ---
 
 ## 🛠️ Setup Instructions
 
-### 1. Set Up Apache & MySQL
+### 1. ⚙️ Configure Apache & MySQL
+
+#### Import the Database
 
 ```bash
-# Import the database
 mysql -u [user] -p [database_name] < backend/database.sql
-````
+```
+
+#### Configure Database Connection
 
 Edit `backend/api/config.php`:
 
@@ -80,7 +97,7 @@ define('DB_PASS', '[password]');
 
 ---
 
-### 2. Fix MySQL Access (If Needed)
+### 2. 🔐 Fix MySQL Access (If Needed)
 
 ```bash
 sudo systemctl stop mariadb
@@ -88,7 +105,7 @@ sudo mysqld_safe --skip-grant-tables --skip-networking &
 mysql -u root
 ```
 
-Inside MySQL:
+Inside MySQL shell:
 
 ```sql
 USE mysql;
@@ -96,7 +113,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '[new_pas
 FLUSH PRIVILEGES;
 ```
 
-Then:
+Restart:
 
 ```bash
 sudo killall mysqld
@@ -106,17 +123,22 @@ mysql -u root -p
 
 ---
 
-### 3. Configure Apache
+### 3. 🧭 Configure Apache
+
+Place the backend folder in:
+
+```
+/var/www/html/[app_name]/backend
+```
+
+Enable URL rewriting:
 
 ```bash
-# Place the backend folder in:
-# /var/www/html/[app_name]/backend
-
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 ```
 
-Update `/etc/apache2/sites-available/000-default.conf`:
+Edit `/etc/apache2/sites-available/000-default.conf`:
 
 ```apache
 <Directory /var/www/html>
@@ -124,7 +146,7 @@ Update `/etc/apache2/sites-available/000-default.conf`:
 </Directory>
 ```
 
-Then:
+Restart Apache:
 
 ```bash
 sudo systemctl restart apache2
@@ -132,7 +154,7 @@ sudo systemctl restart apache2
 
 ---
 
-### 4. Set Up React Frontend
+### 4. ⚛️ Set Up the React Frontend
 
 ```bash
 cd frontend
@@ -140,16 +162,17 @@ npm install
 npm start
 ```
 
-Runs on `[frontend_url]`, proxies API calls to `[backend_api_url]`.
+* Frontend runs on **\[frontend\_url]**
+* Proxies API requests to **\[backend\_api\_url]**
 
 ---
 
-### 5. Access the App
+### 5. 🚪 Access the Application
 
-* **Scoreboard**: `[frontend_url]/`
-* **Judge Portal**: `[frontend_url]/judge`
-* **Admin Panel**: `[frontend_url]/admin`
-* **Participant Panel**: `[frontend_url]/participant`
+* **Live Scoreboard**: \[frontend\_url]/
+* **Judge Portal**: \[frontend\_url]/judge
+* **Admin Panel**: \[frontend\_url]/admin
+* **Participant Panel**: \[frontend\_url]/participant
 
 ---
 
@@ -167,7 +190,6 @@ scoringsystem/
 │       │   ├── icons/
 │       │   │   └── index.js
 │       │   ├── layout/
-│       │   │   ├── Header.js
 │       │   │   ├── Sidebar.js
 │       │   │   └── Footer.js
 │       │   ├── AdminPanel.js
@@ -204,9 +226,6 @@ scoringsystem/
 │   ├── tests/
 │   │   └── api/
 │   └── cache/
-├── docs/
-│   ├── api.md
-│   └── setup.md
 └── README.md
 ```
 
@@ -214,13 +233,13 @@ scoringsystem/
 
 ## 🧩 Database Schema
 
-Tables include:
+The database includes the following tables:
 
-* `judges`: Judge info
-* `participants`: Participant info
-* `scores`: Points awarded
-* `categories`: Score categories
-* `roles`: User roles
+* `judges`: Stores judge information
+* `participants`: Stores participant details
+* `scores`: Tracks points awarded
+* `categories`: Defines scoring categories
+* `roles`: Manages user roles
 
 ```mermaid
 erDiagram
@@ -234,19 +253,19 @@ erDiagram
 
 ## 🌐 API Endpoints
 
-RESTful API served from `backend/api/`.
+Base path: `backend/api/`
 
-| Endpoint                    | Method | Auth     | Description                    |
-| --------------------------- | ------ | -------- | ------------------------------ |
-| `/api/login.php`            | POST   | None     | Log in a user                  |
-| `/api/get_judges.php`       | GET    | None     | List all judges                |
-| `/api/add_judge.php`        | POST   | Admin    | Add a new judge                |
-| `/api/get_participants.php` | GET    | Optional | List all participants          |
-| `/api/users.php`            | GET    | None     | Alias for listing participants |
-| `/api/get_categories.php`   | GET    | None     | List all categories            |
-| `/api/scores.php`           | GET    | None     | Get scoreboard                 |
-| `/api/submit_score.php`     | POST   | Judge    | Submit a score                 |
-| `/api/get_stats.php`        | GET    | None     | Get system stats               |
+| Endpoint                    | Method | Auth     | Description                |
+| --------------------------- | ------ | -------- | -------------------------- |
+| `/api/login.php`            | POST   | None     | Authenticate a user        |
+| `/api/get_judges.php`       | GET    | None     | List all judges            |
+| `/api/add_judge.php`        | POST   | Admin    | Add a new judge            |
+| `/api/get_participants.php` | GET    | Optional | List participants          |
+| `/api/users.php`            | GET    | None     | Alias for participants     |
+| `/api/get_categories.php`   | GET    | None     | List score categories      |
+| `/api/scores.php`           | GET    | None     | Retrieve scoreboard data   |
+| `/api/submit_score.php`     | POST   | Judge    | Submit a score             |
+| `/api/get_stats.php`        | GET    | None     | Retrieve system statistics |
 
 ---
 
@@ -254,40 +273,44 @@ RESTful API served from `backend/api/`.
 
 ### `/api/login.php`
 
+**POST JSON:**
+
 ```json
-POST
 {
   "email": "[string]",
   "password": "[string]"
 }
 ```
 
+**Sample Credentials**:
+
+* Admin: `admin@example.com / admin123`
+* Judge: `dennis@example.com / password123`
+
 ---
 
 ### `/api/get_stats.php`
 
-```http
-GET
-```
-
-Response: `[judge/participant stats]`
-
----
+**GET** – Returns judge and participant statistics
 
 ### `/api/get_participants.php`
 
-```http
-GET
-```
+**GET** – Returns:
 
-Response: `[array of { id, name }]`
+```json
+[
+  { "id": 1, "name": "Participant A" },
+  ...
+]
+```
 
 ---
 
 ### `/api/submit_score.php`
 
+**POST JSON:**
+
 ```json
-POST
 {
   "judge_id": [integer],
   "participant_id": [integer],
@@ -300,11 +323,14 @@ POST
 
 ### `/api/get_categories.php`
 
-```http
-GET
-```
+**GET** – Returns:
 
-Response: `[array of { id, name }]`
+```json
+[
+  { "id": 1, "name": "Creativity" },
+  ...
+]
+```
 
 ---
 
@@ -312,40 +338,40 @@ Response: `[array of { id, name }]`
 
 * **Admin**: Manage judges, view stats
 * **Judge**: Submit scores
-* **Participants**: View the scoreboard
+* **Participant**: View scoreboard
 
 ---
 
 ## 💡 Design Choices
 
-* **LAMP Stack**: Proven for backend use
-* **React Frontend**: Dynamic UI, \[HTTP client placeholder]
-* **Database**: Normalized, prevents duplicate scores
-* **API**: RESTful, secure via prepared statements
-* **Scoreboard**: Refreshes every `[interval placeholder]`
-* **Security**: No auth in mockup. Use `[auth method placeholder]` in production
+* **LAMP Stack**: Robust and widely supported
+* **React Frontend**: Dynamic UI using \[HTTP client placeholder]
+* **Database**: Normalized schema to prevent duplication
+* **API**: RESTful, secure with prepared statements
+* **Scoreboard**: Auto-refreshes every \[interval placeholder]
+* **Security**: Placeholder setup; recommend \[auth method placeholder] in production
 
 ---
 
 ## 📌 Assumptions
 
-* `/users.php` = participants
-* Participants preloaded in DB
-* Local setup
-* API at `[backend_api_url]`
+* `/users.php` = Participants
+* Participants are preloaded in DB
+* App runs locally
+* API available at **\[backend\_api\_url]**
 
 ---
 
 ## 🧪 Testing
 
-**Backend Tests:**
+### Backend
 
 ```bash
 cd backend
 [test_command_placeholder]
 ```
 
-**Frontend Tests:**
+### Frontend
 
 ```bash
 cd frontend
@@ -356,28 +382,32 @@ npm test
 
 ## 🚀 Future Improvements
 
-* Add `[auth method placeholder]`
-* Form validation
-* Responsive design with `[CSS framework placeholder]`
-* Admin UI to manage participants
-* Real-time scoreboard using `[real-time tech placeholder]`
-* Add logging via `[logging tool placeholder]`
+* Implement **\[auth method placeholder]**
+* Add **form validation**
+* Use **\[CSS framework placeholder]** for better UI
+* Create **admin UI** for participant management
+* Enable **real-time updates** via \[real-time tech placeholder]
+* Add logging with **\[logging tool placeholder]**
 
 ---
 
 ## 🌍 Deployment
 
-1. Deploy PHP backend to `[server placeholder]`
-2. Build React app:
+1. Deploy PHP backend to **\[server placeholder]**
+2. Build frontend:
 
 ```bash
 cd frontend
 npm run build
 ```
 
-3. Serve via `[server/CDN placeholder]`
-4. Update CORS in `backend/api/config.php`
+3. Serve frontend via **\[server/CDN placeholder]**
+4. Update **CORS** in `backend/api/config.php`
 
-> ⚠️ Note: No public link for local setup
+> ⚠️ No public URL available for local setups.
 
 ---
+
+
+---
+

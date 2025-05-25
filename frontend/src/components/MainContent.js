@@ -59,6 +59,35 @@ const Breadcrumbs = () => {
   );
 };
 
+/**
+ * MainContent Component
+ * 
+ * This component serves as the main content area of the application. It is structured
+ * to provide a responsive layout with multiple sections, including a competition dashboard,
+ * live scoreboard, and participants list. The component utilizes React Suspense for lazy
+ * loading and displays a fallback spinner during loading.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered MainContent component.
+ * 
+ * @example
+ * // Usage in a parent component
+ * import MainContent from './MainContent';
+ * 
+ * function App() {
+ *   return (
+ *     <div>
+ *       <MainContent />
+ *     </div>
+ *   );
+ * }
+ * 
+ * @remarks
+ * - The component includes a breadcrumb navigation and a login button at the top.
+ * - Each section is wrapped with a `PageTitle` component for consistent headings.
+ * - The `Suspense` component ensures that the content is loaded asynchronously.
+ * - The layout is styled using Tailwind CSS classes for responsiveness and spacing.
+ */
 const MainContent = () => {
 
   return (

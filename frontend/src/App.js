@@ -62,6 +62,12 @@ const Layout = ({ children }) => {
   );
 };
 
+/**
+ * Main application component that handles routing and authentication.
+ * Sets up the router with protected and public routes, authentication provider,
+ * and main application layout.
+ * @returns {JSX.Element} The rendered application component
+ */
 function App() {
   return (
     <AuthProvider>

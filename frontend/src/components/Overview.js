@@ -3,6 +3,43 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import StatCard from './cards/StatCard';
 
+/**
+ * Overview Component
+ * 
+ * This component displays a dashboard with an overview of competition statistics.
+ * It fetches data from an API endpoint and updates the UI with the latest statistics.
+ * The data includes active participants, active judges, active categories, total scores,
+ * and other related metrics.
+ * 
+ * Features:
+ * - Automatically fetches statistics on component mount and refreshes every 30 seconds.
+ * - Provides a manual refresh button for users to update the data on demand.
+ * - Displays loading states and error messages when fetching data.
+ * - Dynamically renders statistic cards with icons, labels, and values.
+ * 
+ * State Variables:
+ * - `stats`: Holds the fetched statistics data, including overview and detailed metrics.
+ * - `loading`: Indicates whether the data is currently being fetched.
+ * - `error`: Stores any error messages encountered during data fetching.
+ * 
+ * API Integration:
+ * - Fetches data from `/get_stats.php` endpoint.
+ * - Handles potential API response issues, such as unexpected strings or errors.
+ * 
+ * UI Components:
+ * - Displays a grid of statistic cards with icons and descriptions.
+ * - Shows a refresh button with a loading spinner when fetching data.
+ * - Displays an error message if the API call fails.
+ * 
+ * Hooks:
+ * - `useEffect`: Triggers the initial data fetch and sets up a periodic refresh interval.
+ * 
+ * Dependencies:
+ * - `axios`: Used for making API requests.
+ * - `useState`, `useEffect`: React hooks for managing state and lifecycle.
+ * 
+ * @component
+ */
 const Overview = () => {
   const [stats, setStats] = useState({
     overview: {

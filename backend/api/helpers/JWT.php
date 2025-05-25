@@ -1,3 +1,17 @@
+/**
+ * JWT (JSON Web Token) Class
+ * 
+ * A class for generating and verifying JSON Web Tokens (JWT).
+ * Implements basic JWT functionality with HS256 algorithm for signing.
+ * Tokens include expiration time and are verified against a secret key.
+ * 
+ * Constants required:
+ * - JWT_SECRET: Secret key used for token signing
+ * - JWT_EXPIRE: Token expiration time in seconds
+ *
+ * @author Your Name
+ * @package Authentication
+ */
 <?php
 class JWT {
     public static function generate($payload) {

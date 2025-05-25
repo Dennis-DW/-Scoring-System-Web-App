@@ -1,5 +1,5 @@
 <?php
-// /var/www/html/scoringsystem/backend/api/get_stats.php
+//backend/api/get_stats.php
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:3000');

@@ -1,9 +1,12 @@
 // components/Login.js
+
+// Import necessary hooks and components
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
+  // State for user credentials, loading status, error messages, and validation errors
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
@@ -13,19 +16,22 @@ const Login = () => {
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
   
+  // Extract login function, authentication status, and error from AuthContext
   const { login, isAuthenticated, error: authError } = useAuth();
 
+  // Update error state when authentication error changes
   useEffect(() => {
     if (authError) {
       setError(authError);
     }
   }, [authError]);
 
-  // Redirect if already authenticated
+  // Redirect to home page if the user is already authenticated
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
+  // Validate the login form inputs
   const validateForm = () => {
     const errors = {};
     if (!credentials.email) {
@@ -42,22 +48,26 @@ const Login = () => {
     return Object.keys(errors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
+    // Validate form before proceeding
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
     try {
+      // Attempt to log in with provided credentials
       await login(
         credentials.email.trim(),
         credentials.password,
         credentials.remember
       );
     } catch (err) {
+      // Handle login errors
       setError(err.message || 'Failed to log in. Please check your credentials.');
       console.error('Login error:', err);
     } finally {
@@ -65,13 +75,14 @@ const Login = () => {
     }
   };
 
+  // Handle input changes and update state
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCredentials(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear validation error when user types
+    // Clear validation error for the field being updated
     if (validationErrors[name]) {
       setValidationErrors(prev => ({
         ...prev,
@@ -80,6 +91,7 @@ const Login = () => {
     }
   };
 
+  // Render the login form
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -90,12 +102,14 @@ const Login = () => {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
+          {/* Display error message if any */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 text-red-700">
               {error}
             </div>
           )}
 
+          {/* Input fields for email and password */}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">Email address</label>
@@ -145,6 +159,7 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Remember me checkbox and forgot password link */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -171,6 +186,7 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Submit button */}
           <div>
             <button
               type="submit"

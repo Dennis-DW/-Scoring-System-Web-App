@@ -2,6 +2,32 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * JudgesList Component
+ * 
+ * This component renders a list of judges with sorting, searching, and loading functionalities.
+ * It displays judge details such as name, username, email, status, and stats.
+ * 
+ * @component
+ * 
+ * @param {Object} props - Component properties.
+ * @param {Array<Object>} props.judges - List of judges to display. Each judge object should contain:
+ *   @param {string} [props.judges[].id] - Unique identifier for the judge.
+ *   @param {string} [props.judges[].displayName] - Display name of the judge.
+ *   @param {string} [props.judges[].username] - Username of the judge.
+ *   @param {string} [props.judges[].email] - Email address of the judge.
+ *   @param {string} [props.judges[].role] - Role of the judge.
+ *   @param {boolean} [props.judges[].isActive] - Indicates if the judge is active.
+ *   @param {Object} [props.judges[].stats] - Statistics related to the judge.
+ *     @param {number} [props.judges[].stats.scoresGiven] - Number of scores given by the judge.
+ *     @param {number} [props.judges[].stats.participantsScored] - Number of participants scored by the judge.
+ * @param {boolean} [props.loading=false] - Indicates if the data is still loading.
+ * @param {Function} [props.onSort] - Callback function triggered when sorting is applied.
+ *   @param {string} props.onSort.field - The field being sorted.
+ *   @param {string} props.onSort.direction - The direction of sorting ('asc' or 'desc').
+ * 
+ * @returns {JSX.Element} The rendered JudgesList component.
+ */
 const JudgesList = ({ judges = [], loading = false, onSort }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('display_name');

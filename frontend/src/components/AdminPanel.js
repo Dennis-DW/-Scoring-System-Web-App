@@ -20,6 +20,19 @@ const errorToastConfig = {
   autoClose: 5000,
 };
 
+/**
+ * AdminPanel component for managing judges in the scoring system.
+ * Provides functionality to add new judges and display a list of existing judges.
+ * Handles form submission, data validation, and real-time updates.
+ * 
+ * @component
+ * @example
+ * return (
+ *   <AdminPanel />
+ * )
+ * 
+ * @returns {JSX.Element} The admin panel interface for judge management
+ */
 function AdminPanel() {
   const [formData, setFormData] = useState({
     username: '',
