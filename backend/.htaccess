@@ -1,0 +1,42 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Set security headers
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set X-XSS-Protection "1; mode=block"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Enable CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
+
+# API requests handling
+RewriteCond %{REQUEST_URI} ^/scoringsystem/backend/api/(.*)$
+RewriteRule ^backend/api/(.*)$ backend/api/$1 [L]
+
+# Cache control for static assets
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|svg)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# Don't rewrite files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Serve React frontend
+RewriteRule ^(.*)$ frontend/build/index.html [L]
+
+# Error handling
+ErrorDocument 404 /frontend/build/index.html
+ErrorDocument 500 /frontend/build/index.html
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect .htaccess file
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>

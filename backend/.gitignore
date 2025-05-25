@@ -1,0 +1,32 @@
+# PHP
+/vendor/
+composer.lock
+composer.phar
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Cache and logs
+/cache/*
+!/cache/.gitkeep
+*.log
+error_log
+*.cache
+.phpunit.result.cache
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.swp
+*.swo
+*~
+.php_cs.cache
