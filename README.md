@@ -68,8 +68,8 @@ npm install
   * Linux OS
   * Apache Web Server
   * MySQL/MariaDB
-  * PHP \[version placeholder]
-* **Node.js**: \[version placeholder]
+  * PHP 
+* **Node.js**: 
 * **Composer** *(optional, for PHP dependency management)*
 
 ---
