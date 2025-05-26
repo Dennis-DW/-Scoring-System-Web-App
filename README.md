@@ -36,7 +36,7 @@ graph TD
 ### 🔄 Clone the Repository
 
 ```bash
-git clone [ https://github.com/Dennis-DW/-Scoring-System-Web-App.git]
+git clone https://github.com/Dennis-DW/-Scoring-System-Web-App.git
 ```
 
 ### 🛢️ Set Up the Database
