@@ -383,17 +383,6 @@ npm test
 
 ---
 
-## 🚀 Future Improvements
-
-* Implement **\[auth method placeholder]**
-* Add **form validation**
-* Use **\[CSS framework placeholder]** for better UI
-* Create **admin UI** for participant management
-* Enable **real-time updates** via \[real-time tech placeholder]
-* Add logging with **\[logging tool placeholder]**
-
----
-
 ## 🌍 Deployment
 
 1. Deploy PHP backend to **\[server placeholder]**
