@@ -1,57 +1,8 @@
-// components/Participants.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'; 
 import axios from 'axios';
 import UserCard from './cards/UserCard';
 import { generateAvatar } from '../utils/avatarUtils';
 
-/**
- * Participants Component
- * 
- * This component displays a list of participants with features such as sorting, searching, and refreshing.
- * It fetches participant data from an API, processes it, and renders it in a grid layout.
- * 
- * State Variables:
- * - `participants`: Array of participant objects with additional computed properties like avatar, rank, and status.
- * - `loading`: Boolean indicating whether data is being fetched.
- * - `error`: String containing error messages, if any.
- * - `searchTerm`: String used to filter participants by name, email, or registration.
- * - `sortBy`: Field by which participants are sorted (e.g., "average_score", "name", "total_scores").
- * - `sortOrder`: Sorting order, either "asc" (ascending) or "desc" (descending).
- * 
- * Functions:
- * - `fetchParticipants`: Fetches participant data from the API, processes it, and updates the state.
- * - `calculateRank`: Calculates the rank of a participant based on their average score.
- * - `handleSort`: Toggles sorting order or changes the sorting field.
- * - `getSortValue`: Retrieves the value of a participant's field for sorting purposes.
- * 
- * Effects:
- * - `useEffect`: Fetches participants on component mount and sets up a 30-second interval for refreshing data.
- * 
- * Rendered Elements:
- * - Header: Displays the title and the number of participants currently shown.
- * - Controls: Includes sorting dropdown, search input, and a refresh button.
- * - Error Message: Displays an error message if data fetching fails.
- * - Participant Grid: Displays participant cards with details like name, score, rank, and status.
- * - Empty State: Shown when no participants match the search or when the list is empty.
- * 
- * Props for `UserCard` Component:
- * - `avatar`: URL or placeholder for the participant's avatar.
- * - `name`: Participant's name.
- * - `email`: Participant's email address.
- * - `registration`: Participant's registration details.
- * - `projectName`: A string indicating the participant's current standing.
- * - `score`: Participant's average score.
- * - `totalScores`: Total number of scores received by the participant.
- * - `judgesCount`: Number of judges who scored the participant.
- * - `lastScored`: Timestamp of the last score received.
- * - `status`: Status of the participant (e.g., "active" or "pending").
- * - `onView`: Callback function to navigate to the participant's detailed view.
- * 
- * Notes:
- * - The component handles API responses that may include extraneous messages (e.g., "Connected successfully").
- * - Sorting supports both numeric and string fields.
- * - The refresh button is disabled while data is being fetched.
- */
 const Participants = () => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,16 +11,16 @@ const Participants = () => {
   const [sortBy, setSortBy] = useState('average_score');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  const fetchParticipants = async () => {
+  const fetchParticipants = useCallback(async () => {
     try {
       console.log('Fetching participants...');
       setError(null);
       setLoading(true);
-      
+
       const response = await axios.get('/get_participants.php');
       console.log('Raw API response:', response.data);
-  
-      // Remove "Connected successfully" messages if present
+
+      // Clean data processing
       let cleanData;
       if (typeof response.data === 'string') {
         const jsonStart = response.data.indexOf('{');
@@ -78,20 +29,31 @@ const Participants = () => {
       } else {
         cleanData = response.data;
       }
-  
+
       console.log('Cleaned data:', cleanData);
-  
+
       if (cleanData.success && cleanData.participants) {
+        // Move calculateRank inside to access latest participants
+        const calculateRank = (score, allParticipants) => {
+          if (!score) return null;
+          const sortedScores = [...new Set(allParticipants
+            .map(p => p.stats.average_score)
+            .filter(Boolean)
+            .sort((a, b) => b - a)
+          )];
+          return sortedScores.indexOf(score) + 1;
+        };
+
         const participantsWithAvatars = cleanData.participants.map(participant => ({
           ...participant,
           avatar: generateAvatar(participant.name),
           score: participant.stats.average_score,
-          rank: calculateRank(participant.stats.average_score),
-          status: participant.stats.total_scores > 0 ? 'active' : 'pending'
+          rank: calculateRank(participant.stats.average_score, cleanData.participants),
+          status: participant.stats.total_scores > 0 ? 'active' : 'pending',
         }));
-  
+
         console.log('Processed participants:', participantsWithAvatars);
-        
+
         setParticipants(participantsWithAvatars);
         setError(null);
       } else {
@@ -101,30 +63,20 @@ const Participants = () => {
       console.error('Participants fetch error:', {
         message: err.message,
         raw: err,
-        response: err.response?.data
+        response: err.response?.data,
       });
       setError('Failed to load participants');
     } finally {
       setLoading(false);
       console.log('Fetch completed');
     }
-  };
-
-  const calculateRank = (score) => {
-    if (!score) return null;
-    const sortedScores = [...new Set(participants
-      .map(p => p.stats.average_score)
-      .filter(Boolean)
-      .sort((a, b) => b - a)
-    )];
-    return sortedScores.indexOf(score) + 1;
-  };
+  }, []); 
 
   useEffect(() => {
     fetchParticipants();
     const interval = setInterval(fetchParticipants, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchParticipants]); 
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -149,7 +101,7 @@ const Participants = () => {
   };
 
   const filteredAndSortedParticipants = participants
-    .filter(p => 
+    .filter(p =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.registration?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -159,7 +111,7 @@ const Participants = () => {
       const aValue = getSortValue(a, sortBy);
       const bValue = getSortValue(b, sortBy);
       return multiplier * (
-        typeof aValue === 'string' 
+        typeof aValue === 'string'
           ? aValue.localeCompare(bValue)
           : (bValue || 0) - (aValue || 0)
       );
@@ -174,7 +126,7 @@ const Participants = () => {
             Currently showing <span className="font-semibold">{filteredAndSortedParticipants.length} participants</span>
           </h3>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <select
@@ -193,7 +145,7 @@ const Participants = () => {
               {sortOrder === 'asc' ? '↑' : '↓'}
             </button>
           </div>
-          
+
           <input
             type="text"
             placeholder="Search participants..."
@@ -201,7 +153,7 @@ const Participants = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          
+
           <button
             onClick={fetchParticipants}
             disabled={loading}
@@ -252,7 +204,7 @@ const Participants = () => {
           ))
         ) : (
           filteredAndSortedParticipants.map((participant) => (
-            <UserCard 
+            <UserCard
               key={participant.id}
               avatar={participant.avatar}
               name={participant.name}
