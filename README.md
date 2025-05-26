@@ -86,7 +86,7 @@ mysql -u [user] -p [database_name] < backend/database.sql
 
 #### Configure Database Connection
 
-Edit `backend/api/config.php`:
+Edit `backend/api/config/db_config`:
 
 ```php
 define('DB_HOST', '[host]');
