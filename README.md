@@ -162,8 +162,8 @@ npm install
 npm start
 ```
 
-* Frontend runs on **\[frontend\_url]**
-* Proxies API requests to **\[backend\_api\_url]**
+* Frontend runs on **\[http://localhost:3000]**
+* Proxies API requests to **\[http://localhost/scoringsystem/backend/api]**
 
 ---
 
