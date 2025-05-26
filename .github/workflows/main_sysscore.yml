@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,20 +23,28 @@ jobs:
         with:
           php-version: '8.1'
 
-      - name: Check if composer.json exists
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Check if composer.json exists in backend/
         id: check_files
         uses: andstor/file-existence-action@v1
         with:
-          files: 'composer.json'
+          files: 'backend/composer.json'
 
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
+        working-directory: backend
         run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: Zip backend folder for deployment
+        run: zip -r release.zip backend/
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: php-app
@@ -49,8 +57,8 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
@@ -58,21 +66,18 @@ jobs:
         with:
           name: php-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F7AA3C088036404EAE8AB96A12781A85 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A2BFB716FA0F4F12A9C8F31A404BE6BF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9CF9E6C953B046F6B8252607B5F9D67A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_22DEBA01EF7B44CFBAD153E2BB128AFD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_659A6E8200024988B341BD6F1AC071A6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EBBB178EF0AE4C96B5B317B79761AE9A }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'sysscore'
           slot-name: 'Production'
-          package: .
+          package: release.zip
           
