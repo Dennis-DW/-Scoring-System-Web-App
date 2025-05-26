@@ -88,11 +88,14 @@ mysql -u [user] -p [database_name] < backend/database.sql
 
 Edit `backend/api/config/db_config`:
 
-```php
-define('DB_HOST', '[host]');
-define('DB_NAME', '[database_name]');
-define('DB_USER', '[user]');
-define('DB_PASS', '[password]');
+```
+<?php
+return [
+    'host' => 'localhost',
+    'dbname' => 'database_name',
+    'username' => 'user',
+    'password' => 'password'
+];
 ```
 
 ---
