@@ -36,13 +36,13 @@ graph TD
 ### 🔄 Clone the Repository
 
 ```bash
-git clone [repository_url]
+git clone [ https://github.com/Dennis-DW/-Scoring-System-Web-App.git]
 ```
 
 ### 🛢️ Set Up the Database
 
 ```bash
-mysql -u [user] -p [database_name] < backend/database/database.sql
+mysql -u [user] -p [database_name] < backend/sql/database.sql
 ```
 
 ### ⚙️ Install Backend Dependencies
