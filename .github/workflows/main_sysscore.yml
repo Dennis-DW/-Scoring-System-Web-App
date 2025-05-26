@@ -1,6 +1,6 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-
+  
 name: Build and deploy PHP app to Azure Web App - sysscore
 
 on:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Updated to 8.2
+          php-version: '8.2'
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -80,4 +80,7 @@ jobs:
           app-name: 'sysscore'
           slot-name: 'Production'
           package: release.zip
+
+
+     
           
