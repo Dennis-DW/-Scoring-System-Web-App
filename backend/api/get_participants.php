@@ -1,9 +1,8 @@
 <?php
 // get_participants.php
-header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: https://white-meadow-0c5eba71e.6.azurestaticapps.net");
-
 header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Content-Type: application/json');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Credentials: true');
 
@@ -11,7 +10,9 @@ require_once __DIR__ . '/../config/db_connect.php';
 
 try {
     $pdo = connectDB();
-    
+        if (!$pdo) {
+        throw new Exception('Database connection failed');
+    }
     // Get participants with scores
     $query = "
         SELECT 
@@ -58,10 +59,11 @@ try {
     echo json_encode($response, JSON_NUMERIC_CHECK);
 
 } catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
+    error_log("Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Database error occurred'
+        'error' => 'An error occurred while processing your request'
     ]);
+    exit;
 }
