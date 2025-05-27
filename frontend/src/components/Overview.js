@@ -138,7 +138,7 @@ const fetchStats = async () => {
     fetchStats();
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchStats]);
 
   const statsData = [
     {
