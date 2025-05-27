@@ -62,7 +62,7 @@ const fetchStats = async () => {
     console.log('Fetching statistics...');
     setError(null);
     
-    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/get_stats.php`);
+    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_stats.php`);
     console.log('Raw API response:', response.data);
 
     // Remove "Connected successfully" messages if present

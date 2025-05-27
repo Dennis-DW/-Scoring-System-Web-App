@@ -30,7 +30,7 @@ export const useParticipants = () => {
       setError(null);
       setLoading(true);
       
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/get_participants.php`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_participants.php`);
       const cleanData = processParticipantData(response.data);
 
       if (cleanData.success && cleanData.participants) {
