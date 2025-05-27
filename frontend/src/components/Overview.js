@@ -57,80 +57,57 @@ const Overview = () => {
   const [error, setError] = useState(null);
 
 
-// Helper function to extract JSON from potentially malformed response
-const extractJSON = (responseData) => {
-  if (typeof responseData !== 'string') {
-    return responseData;
-  }
-
-  try {
-    // Find all potential JSON start positions
-    const jsonStarts = [...responseData.matchAll(/{/g)].map(match => match.index);
-    
-    // Try each potential JSON start position
-    for (const start of jsonStarts) {
-      try {
-        const potentialJSON = responseData.substring(start);
-        const parsed = JSON.parse(potentialJSON);
-        if (parsed && typeof parsed === 'object') {
-          return parsed;
-        }
-      } catch (e) {
-        continue; // Try next position if this one fails
-      }
-    }
-    
-    throw new Error('No valid JSON found in response');
-  } catch (error) {
-    console.error('JSON extraction failed:', error);
-    throw new Error(`Failed to extract JSON: ${error.message}`);
-  }
-};
-
-// Update the fetchStats function
 const fetchStats = async () => {
   try {
+    console.log('Fetching statistics...');
     setError(null);
-    setLoading(true);
     
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/backend/api/get_stats.php`,
-      { timeout: 5000 }
-    );
+    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_stats.php`);
+    console.log('Raw API response:', response.data);
 
-    console.log('Raw response:', response.data);
-    
-    const cleanData = extractJSON(response.data);
-    console.log('Parsed data:', cleanData);
-
-    if (!cleanData?.success || !cleanData?.stats?.overview) {
-      throw new Error('Invalid response structure');
+    // Remove "Connected successfully" messages if present
+    let cleanData;
+    if (typeof response.data === 'string') {
+      const jsonStart = response.data.indexOf('{');
+      const jsonString = response.data.substring(jsonStart);
+      cleanData = JSON.parse(jsonString);
+    } else {
+      cleanData = response.data;
     }
 
-    const overviewStats = {
-      active_participants: parseInt(cleanData.stats.overview.active_participants) || 0,
-      active_judges: parseInt(cleanData.stats.overview.active_judges) || 0,
-      active_categories: parseInt(cleanData.stats.overview.active_categories) || 0,
-      total_scores: parseInt(cleanData.stats.overview.total_scores) || 0
-    };
+    console.log('Cleaned data:', cleanData);
 
-    setStats({
-      overview: overviewStats,
-      categories: Array.isArray(cleanData.stats.categories) ? cleanData.stats.categories : [],
-      judge_activity: Array.isArray(cleanData.stats.judge_activity) ? cleanData.stats.judge_activity : [],
-      top_participants: Array.isArray(cleanData.stats.top_participants) ? cleanData.stats.top_participants : [],
-      recent_activity: Array.isArray(cleanData.stats.recent_activity) ? cleanData.stats.recent_activity : []
-    });
+    if (cleanData.success && cleanData.stats) {
+      // Use the overview data directly from API response
+      const overviewStats = cleanData.stats.overview || {
+        active_participants: 0,
+        active_judges: 0,
+        active_categories: 0,
+        total_scores: 0
+      };
 
+      console.log('Overview stats:', overviewStats);
+      
+      setStats({
+        overview: overviewStats,
+        categories: cleanData.stats.categories || [],
+        judge_activity: cleanData.stats.judge_activity || [],
+        top_participants: cleanData.stats.top_participants || [],
+        recent_activity: cleanData.stats.recent_activity || []
+      });
+    } else {
+      throw new Error(cleanData.error || 'Invalid response format');
+    }
   } catch (err) {
     console.error('Stats fetch error:', {
       message: err.message,
       raw: err,
       response: err.response?.data
     });
-    setError(`Failed to load statistics: ${err.message}`);
+    setError('Failed to load statistics');
   } finally {
     setLoading(false);
+    console.log('Fetch completed');
   }
 };
 
@@ -138,7 +115,7 @@ const fetchStats = async () => {
     fetchStats();
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
-  }, [fetchStats]);
+  }, []);
 
   const statsData = [
     {
