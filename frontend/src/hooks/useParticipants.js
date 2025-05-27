@@ -30,7 +30,7 @@ export const useParticipants = () => {
       setError(null);
       setLoading(true);
       
-      const response = await axios.get('/get_participants.php');
+      const response = await axios.get('/api/get_participants.php');
       const cleanData = processParticipantData(response.data);
 
       if (cleanData.success && cleanData.participants) {

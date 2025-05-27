@@ -62,7 +62,7 @@ const fetchStats = async () => {
     console.log('Fetching statistics...');
     setError(null);
     
-    const response = await axios.get('/get_stats.php');
+    const response = await axios.get('/api/get_stats.php');
     console.log('Raw API response:', response.data);
 
     // Remove "Connected successfully" messages if present

@@ -2,7 +2,7 @@
     "routes": [
       {
         "route": "/api/*",
-        "rewrite": "https://scoringsys.azurewebsites.net/backend/api/:*"
+        "rewrite": "https://sysde-f6ghapgxbaepefdd.canadacentral-01.azurewebsites.net/backend/api/:*"
       }
     ]
   }
