@@ -1,0 +1,9 @@
+{
+    "routes": [
+      {
+        "route": "/api/*",
+        "rewrite": "https://scoringsys.azurewebsites.net/backend/api/:*"
+      }
+    ]
+  }
+  
