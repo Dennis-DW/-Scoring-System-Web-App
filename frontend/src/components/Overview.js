@@ -57,39 +57,37 @@ const Overview = () => {
   const [error, setError] = useState(null);
 
 
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 1000;
+const fetchStats = async () => {
+  try {
+    console.log('Fetching statistics...');
+    setError(null);
+    
+    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_stats.php`);
+    console.log('Raw API response:', response.data);
 
-  const fetchStats = async (retryCount = 0) => {
-    try {
-      setLoading(true);
-      setError(null);
+    // Remove "Connected successfully" messages if present
+    let cleanData;
+    if (typeof response.data === 'string') {
+      const jsonStart = response.data.indexOf('{');
+      const jsonString = response.data.substring(jsonStart);
+      cleanData = JSON.parse(jsonString);
+    } else {
+      cleanData = response.data;
+    }
 
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_stats.php`);
+    console.log('Cleaned data:', cleanData);
 
-      // Validate response format
-      if (!response.data) {
-        throw new Error('Empty response received');
-      }
-
-      // Clean and parse response data
-      const cleanData = typeof response.data === 'string'
-        ? JSON.parse(response.data.substring(response.data.indexOf('{')))
-        : response.data;
-
-      // Validate response structure
-      if (!cleanData.success || !cleanData.stats) {
-        throw new Error(cleanData.error || 'Invalid response structure');
-      }
-
-      // Extract and validate overview stats
-      const overviewStats = {
-        active_participants: Number(cleanData.stats.overview?.active_participants) || 0,
-        active_judges: Number(cleanData.stats.overview?.active_judges) || 0,
-        active_categories: Number(cleanData.stats.overview?.active_categories) || 0,
-        total_scores: Number(cleanData.stats.overview?.total_scores) || 0
+    if (cleanData.success && cleanData.stats) {
+      // Use the overview data directly from API response
+      const overviewStats = cleanData.stats.overview || {
+        active_participants: 0,
+        active_judges: 0,
+        active_categories: 0,
+        total_scores: 0
       };
 
+      console.log('Overview stats:', overviewStats);
+      
       setStats({
         overview: overviewStats,
         categories: cleanData.stats.categories || [],
@@ -97,25 +95,21 @@ const Overview = () => {
         top_participants: cleanData.stats.top_participants || [],
         recent_activity: cleanData.stats.recent_activity || []
       });
-
-    } catch (err) {
-      // Retry logic for network errors
-      if (retryCount < MAX_RETRIES && axios.isAxiosError(err) && !err.response) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-        return fetchStats(retryCount + 1);
-      }
-
-      console.error('Stats fetch error:', {
-        message: err.message,
-        statusCode: err.response?.status,
-        data: err.response?.data
-      });
-
-      setError('Failed to load statistics');
-    } finally {
-      setLoading(false);
+    } else {
+      throw new Error(cleanData.error || 'Invalid response format');
     }
-  };
+  } catch (err) {
+    console.error('Stats fetch error:', {
+      message: err.message,
+      raw: err,
+      response: err.response?.data
+    });
+    setError('Failed to load statistics');
+  } finally {
+    setLoading(false);
+    console.log('Fetch completed');
+  }
+};
 
   useEffect(() => {
     fetchStats();
@@ -129,9 +123,9 @@ const Overview = () => {
       label: 'Participants',
       icon: (
         <svg className="bi bi-people-fill inline-block size-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-          <path d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z" />
-          <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+          <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+          <path d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+          <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
         </svg>
       ),
       subtext: 'Active participants',
@@ -142,8 +136,8 @@ const Overview = () => {
       label: 'Judges',
       icon: (
         <svg className="bi bi-person-badge inline-block size-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-          <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z" />
+          <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z"/>
         </svg>
       ),
       subtext: 'Active judges',
@@ -154,9 +148,9 @@ const Overview = () => {
       label: 'Scores',
       icon: (
         <svg className="bi bi-clipboard-data inline-block size-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M4 11a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1zm6-4a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V7zM7 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0V9z" />
-          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
-          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
+          <path d="M4 11a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1zm6-4a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V7zM7 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0V9z"/>
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
         </svg>
       ),
       subtext: 'Total scores submitted',
@@ -167,7 +161,7 @@ const Overview = () => {
       label: 'Categories',
       icon: (
         <svg className="bi bi-graph-up inline-block size-4 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5z" />
+          <path d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5z"/>
         </svg>
       ),
       subtext: 'Active categories',
@@ -184,7 +178,7 @@ const Overview = () => {
             Competition Statistics Dashboard
           </h3>
         </div>
-
+        
         <button
           onClick={fetchStats}
           disabled={loading}
@@ -192,8 +186,8 @@ const Overview = () => {
         >
           {loading ? (
             <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
             </svg>
           ) : (
             <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
