@@ -30,7 +30,8 @@ export const useParticipants = () => {
       setError(null);
       setLoading(true);
       
-      const response = await axios.get('/api/get_participants.php');
+      const response = await axios.get('https://sysde-f6ghapgxbaepefdd.canadacentral-01.azurewebsites.net/backend/api/scores.php');
+
       const cleanData = processParticipantData(response.data);
 
       if (cleanData.success && cleanData.participants) {
