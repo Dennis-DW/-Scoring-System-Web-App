@@ -47,8 +47,7 @@ useEffect(() => {
       console.log('Fetching scores...');
       setError(null);
       
-      const response = await axios.get('/api/scores.php');
-
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/scores.php`);
       // console.log('Raw response:', response.data);
 
       // Extract JSON from response that contains extra messages
