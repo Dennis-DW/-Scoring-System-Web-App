@@ -1,82 +1,23 @@
-import { useState, useEffect, useCallback } from 'react'; 
-import axios from 'axios';
+// Participants.js
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useParticipants } from '../hooks/useParticipants';
 import UserCard from './cards/UserCard';
-import { generateAvatar } from '../utils/avatarUtils';
+import LoadingSpinner from './LoadingSpinner';
+import RefreshIcon from './icons/RefreshIcon'
+
 
 const Participants = () => {
-  const [participants, setParticipants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { participants, loading, error, fetch } = useParticipants();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('average_score');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  const fetchParticipants = useCallback(async () => {
-    try {
-      console.log('Fetching participants...');
-      setError(null);
-      setLoading(true);
-
-      const response = await axios.get('/get_participants.php');
-      console.log('Raw API response:', response.data);
-
-      // Clean data processing
-      let cleanData;
-      if (typeof response.data === 'string') {
-        const jsonStart = response.data.indexOf('{');
-        const jsonString = response.data.substring(jsonStart);
-        cleanData = JSON.parse(jsonString);
-      } else {
-        cleanData = response.data;
-      }
-
-      console.log('Cleaned data:', cleanData);
-
-      if (cleanData.success && cleanData.participants) {
-        // Move calculateRank inside to access latest participants
-        const calculateRank = (score, allParticipants) => {
-          if (!score) return null;
-          const sortedScores = [...new Set(allParticipants
-            .map(p => p.stats.average_score)
-            .filter(Boolean)
-            .sort((a, b) => b - a)
-          )];
-          return sortedScores.indexOf(score) + 1;
-        };
-
-        const participantsWithAvatars = cleanData.participants.map(participant => ({
-          ...participant,
-          avatar: generateAvatar(participant.name),
-          score: participant.stats.average_score,
-          rank: calculateRank(participant.stats.average_score, cleanData.participants),
-          status: participant.stats.total_scores > 0 ? 'active' : 'pending',
-        }));
-
-        console.log('Processed participants:', participantsWithAvatars);
-
-        setParticipants(participantsWithAvatars);
-        setError(null);
-      } else {
-        throw new Error(cleanData.error || 'Invalid response format');
-      }
-    } catch (err) {
-      console.error('Participants fetch error:', {
-        message: err.message,
-        raw: err,
-        response: err.response?.data,
-      });
-      setError('Failed to load participants');
-    } finally {
-      setLoading(false);
-      console.log('Fetch completed');
-    }
-  }, []); 
-
   useEffect(() => {
-    fetchParticipants();
-    const interval = setInterval(fetchParticipants, 30000);
+    fetch();
+    const interval = setInterval(fetch, 30000);
     return () => clearInterval(interval);
-  }, [fetchParticipants]); 
+  }, [fetch]);
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -155,20 +96,11 @@ const Participants = () => {
           />
 
           <button
-            onClick={fetchParticipants}
+            onClick={fetch}
             disabled={loading}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? (
-              <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-              </svg>
-            ) : (
-              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            )}
+            {loading ? <LoadingSpinner /> : <RefreshIcon />}
             {loading ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
@@ -187,7 +119,7 @@ const Participants = () => {
             </div>
             <div className="ml-auto pl-3">
               <button
-                onClick={fetchParticipants}
+                onClick={fetch}
                 className="text-sm text-red-600 hover:text-red-500"
               >
                 Try again
@@ -237,6 +169,21 @@ const Participants = () => {
       )}
     </div>
   );
+};
+
+UserCard.propTypes = {
+  loading: PropTypes.bool,
+  avatar: PropTypes.string,
+  name: PropTypes.string,
+  email: PropTypes.string,
+  registration: PropTypes.string,
+  projectName: PropTypes.string,
+  score: PropTypes.number,
+  totalScores: PropTypes.number,
+  judgesCount: PropTypes.number,
+  lastScored: PropTypes.string,
+  status: PropTypes.string,
+  onView: PropTypes.func
 };
 
 export default Participants;
