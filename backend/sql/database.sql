@@ -130,6 +130,11 @@ INSERT INTO participants (name, email, registration_number, bio) VALUES
 ('Bob Wilson', 'bob@example.com', 'PART003', 'Full-stack developer and tech entrepreneur'),
 ('Alice Brown', 'alice@example.com', 'PART004', 'Data scientist with focus on AI/ML'),
 ('Charlie Davis', 'charlie@example.com', 'PART005', 'DevOps engineer and cloud architect');
+('Sarah Chen', 'sarah@example.com', 'PART006', 'Backend developer specializing in distributed systems'),
+('Mohammed Ahmed', 'mohammed@example.com', 'PART007', 'Mobile app developer with expertise in React Native'),
+('Elena Rodriguez', 'elena@example.com', 'PART008', 'System architect with focus on scalable solutions'),
+('David Kim', 'david@example.com', 'PART009', 'Security specialist and penetration tester'),
+('Priya Patel', 'priya@example.com', 'PART010', 'Frontend developer with 3 years of Vue.js experience');
 
 -- Insert comprehensive sample scores
 INSERT INTO scores (judge_id, participant_id, category_id, points, comments) VALUES
