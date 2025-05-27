@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 
 // Add baseURL configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost/scoringsystem/backend/api',
+  baseURL: `${process.env.REACT_APP_API_URL}/backend/api` || '',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -70,49 +70,49 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-// contexts/AuthContext.js
-const login = async (email, password, remember = false) => {
+  // contexts/AuthContext.js
+  const login = async (email, password, remember = false) => {
     try {
       setError(null);
       console.log('Attempting login...');
-      
-      const response = await api.post('/login.php', { 
-        email, 
+
+      const response = await api.post('/login.php', {
+        email,
         password,
-        remember 
+        remember
       });
-      
+
       console.log('Raw response:', response.data);
-      
+
       // Clean response data;
       let data = response.data;
       if (typeof data === 'string') {
         data = JSON.parse(data.substring(data.indexOf('{')));
       }
-      
+
       if (!data.success || !data.token || !data.user) {
         throw new Error(data.error || 'Invalid server response');
       }
-  
+
       localStorage.setItem('token', data.token);
       if (remember && data.refresh_token) {
         localStorage.setItem('refreshToken', data.refresh_token);
       }
-      
+
       setUser(data.user);
       return data.user;
-      
+
     } catch (err) {
       console.error('Login error details:', {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status
       });
-      
-      const errorMessage = err.response?.data?.error || 
-                          err.message || 
-                          'Login failed';
-                          
+
+      const errorMessage = err.response?.data?.error ||
+        err.message ||
+        'Login failed';
+
       setError(errorMessage);
       throw new Error(errorMessage);
     }
