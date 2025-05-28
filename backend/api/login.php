@@ -1,6 +1,7 @@
 <?php
 // login.php
-header("Access-Control-Allow-Origin: https://white-meadow-0c5eba71e.6.azurestaticapps.net");
+header("Access-Control-Allow-Origin: *"); 
+
 
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
