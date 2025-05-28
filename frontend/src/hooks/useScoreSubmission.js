@@ -68,7 +68,7 @@ export const useScoreSubmission = (onSuccess) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/backend/api/submit_score.php`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/submit_score.php`, {
         judge_id: form.judgeId,
         participant_id: form.participantId,
         category_id: form.categoryId,

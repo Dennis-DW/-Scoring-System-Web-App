@@ -53,7 +53,7 @@ function AdminPanel() {
   const fetchJudges = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_judges.php`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_judges.php`);
       const cleanData = typeof response.data === 'string'
         ? JSON.parse(response.data.substring(response.data.indexOf('{')))
         : response.data;
@@ -97,7 +97,7 @@ function AdminPanel() {
 
     try {
       const response = await axios.post(
-        '/add_judge.php',
+        `${process.env.REACT_APP_API_BASE_URL}/api/add_judge.php`,
         {
           username: formData.username,
           display_name: formData.displayName,

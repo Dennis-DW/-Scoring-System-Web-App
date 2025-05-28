@@ -26,10 +26,10 @@ export const useJudgePortalData = () => {
       setMessage({ type: '', text: '' });
 
       const [judgesRes, participantsRes, scoresRes, categoriesRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_judges.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_participants.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_recent_scores.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/backened/api/get_categories.php`),
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_judges.php`),
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_participants.php`),
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_recent_scores.php`),
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_categories.php`),
       ]);
 
       const cleanData = {

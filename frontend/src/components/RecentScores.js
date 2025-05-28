@@ -43,7 +43,7 @@ const RecentScores = ({ refreshInterval = 30000 }) => {
 
   const fetchScores = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/get_recent_scores.php`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_recent_scores.php`);
       
       // Clean response data
       const responseData = typeof response.data === 'string' 

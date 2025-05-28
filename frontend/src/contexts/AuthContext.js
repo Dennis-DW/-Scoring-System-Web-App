@@ -4,12 +4,16 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-// Add baseURL configuration
+// Get API URL from environment with fallback
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost/scoringsystem/backend';
+
+// Create axios instance
 const api = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL}/backend/api` || '',
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  validateStatus: status => status < 500
 });
 
 api.interceptors.request.use(

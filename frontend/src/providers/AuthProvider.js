@@ -5,11 +5,11 @@ import axios from 'axios';
 export const AuthContext = createContext(null);
 
 const STORAGE_KEY = 'auth_state';
-const API_URL = `${process.env.REACT_APP_API_URL}/backend/api` || '';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost/scoringsystem/backend';
 
 // Axios instance with interceptors
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
   }
