@@ -1,7 +1,7 @@
 <?php
 return [
-    'host' => 'localhost',
-    'dbname' => 'scoring_system',
-    'username' => 'root',
-    'password' => '1234'
+    'serverName' => "tcp:sowerved.database.windows.net,1433",
+    'database' => "scoring_system",
+    'username' => "sowerved-default",
+    'password' => getenv('DB_PASSWORD'),
 ];
