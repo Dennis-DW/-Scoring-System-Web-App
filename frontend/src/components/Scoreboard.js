@@ -48,7 +48,7 @@ useEffect(() => {
       setError(null);
       
       const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/backend/api/scores.php`);
-      // console.log('Raw response:', response.data);
+      console.log('Raw response:', response.data);
 
       // Extract JSON from response that contains extra messages
       const jsonStr = response.data.substring(
@@ -57,7 +57,7 @@ useEffect(() => {
       );
       
       const data = JSON.parse(jsonStr);
-      // console.log('Parsed data:', data);
+      console.log('Parsed data:', data);
 
       if (data.success) {
         setScores(data.scores || []);
@@ -66,11 +66,11 @@ useEffect(() => {
         throw new Error(data.error || 'Failed to fetch scores');
       }
     } catch (error) {
-      // console.error('Error details:', {
-      //   message: error.message,
-      //   response: error.response?.data,
-      //   status: error.response?.status
-      // });
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       setError('Failed to fetch scores');
     } finally {
       console.log('Fetch operation completed');
