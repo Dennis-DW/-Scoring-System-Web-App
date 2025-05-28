@@ -1,11 +1,10 @@
-
 <?php
 function connectDB() {
     $config = require __DIR__ . '/db_config.php';
     
     try {
         $pdo = new PDO(
-            "mysql:host={$config['host']};dbname={$config['dbname']}",
+            "sql مدرن:Server={$config['host']},1433;Database={$config['dbname']}",
             $config['username'],
             $config['password']
         );
@@ -16,5 +15,3 @@ function connectDB() {
         die("Connection failed: " . $e->getMessage() . "\n");
     }
 }
-
-connectDB();
