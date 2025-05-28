@@ -8,8 +8,7 @@ Header set X-XSS-Protection "1; mode=block"
 Header set Referrer-Policy "strict-origin-when-cross-origin"
 
 # Enable CORS
-header("Access-Control-Allow-Origin: *"); 
-
+header('Access-Control-Allow-Origin: http://localhost:3000');
 
 Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 Header set Access-Control-Allow-Headers "Content-Type"

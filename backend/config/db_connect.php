@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+// header("Access-Control-Allow-Origin: https://white-meadow-0c5eba71e.6.azurestaticapps.net");
 
 function getDbConnection() {
     try {
