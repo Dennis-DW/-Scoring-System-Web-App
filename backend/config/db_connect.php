@@ -4,7 +4,7 @@ function connectDB() {
     
     try {
         $pdo = new PDO(
-            "sql مدرن:Server={$config['host']},1433;Database={$config['dbname']}",
+            "sqlsrv:Server={$config['host']},1433;Database={$config['dbname']}",
             $config['username'],
             $config['password']
         );
