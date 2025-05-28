@@ -1,1 +1,41 @@
 node_modules
+# Dependencies
+node_modules/
+/vendor/
+package-lock.json
+composer.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build & Distribution
+/dist/
+/build/
+*.zip
+
+# IDE & Editor
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing & Coverage
+/coverage/
+.phpunit.result.cache
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Deployment files
+.vercel
+.netlify
