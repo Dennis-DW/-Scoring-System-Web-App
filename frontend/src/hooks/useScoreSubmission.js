@@ -1,6 +1,6 @@
 // hooks/useScoreSubmission.js
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const processResponse = (data) => {
   if (typeof data === 'string') {
@@ -68,7 +68,7 @@ export const useScoreSubmission = (onSuccess) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/submit_score.php`, {
+      const response = await api.post('/api/submit_score.php', {
         judge_id: form.judgeId,
         participant_id: form.participantId,
         category_id: form.categoryId,

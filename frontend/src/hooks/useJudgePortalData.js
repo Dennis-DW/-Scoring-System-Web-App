@@ -1,6 +1,6 @@
 // hooks/useJudgePortalData.js
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const processResponse = (data) => {
   if (typeof data === 'string') {
@@ -26,10 +26,10 @@ export const useJudgePortalData = () => {
       setMessage({ type: '', text: '' });
 
       const [judgesRes, participantsRes, scoresRes, categoriesRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_judges.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_participants.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_recent_scores.php`),
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_categories.php`),
+       api.get('/api/get_judges.php'),
+       api.get('/api/get_participants.php'),
+       api.get('/api/get_recent_scores.php'),
+       api.get('/api/get_categories.php'),
       ]);
 
       const cleanData = {

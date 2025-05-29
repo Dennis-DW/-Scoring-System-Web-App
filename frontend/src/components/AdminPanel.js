@@ -1,6 +1,6 @@
 // components/AdminPanel.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import JudgesList from './JudgesList';
@@ -53,7 +53,7 @@ function AdminPanel() {
   const fetchJudges = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_judges.php`);
+      const response = await api.get('/api/get_judges.php');
       const cleanData = typeof response.data === 'string'
         ? JSON.parse(response.data.substring(response.data.indexOf('{')))
         : response.data;
@@ -96,8 +96,8 @@ function AdminPanel() {
     const loadingToast = toast.loading('Adding judge...', toastConfig);
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/add_judge.php`,
+      const response = await api.post(
+        '/api/add_judge.php',
         {
           username: formData.username,
           display_name: formData.displayName,

@@ -1,41 +1,48 @@
 <?php
-function connectDB() {
+function connectDB($maxRetries = 3) {
     $config = require __DIR__ . '/db_config.php';
-    $retries = 3;
-    $retry_delay = 2; // seconds
     
-    $dsn = "sqlsrv:Server={$config['serverName']};Database={$config['database']};";
-    $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
-        PDO::ATTR_TIMEOUT => 30, // seconds
-    ];
-
-    for ($i = 0; $i < $retries; $i++) {
+    $attempt = 0;
+    while ($attempt < $maxRetries) {
         try {
-            $pdo = new PDO(
-                $dsn,
-                $config['username'],
-                $config['password'],
-                $options
+            // Build DSN string with charset
+            $dsn = sprintf("mysql:host=%s;dbname=%s;port=%d;charset=utf8mb4",
+                $config['host'],
+                $config['dbname'],
+                $config['port']
             );
+
+            // Connection options
+            $options = [
+                PDO::MYSQL_ATTR_SSL_CA => $config['ssl_ca'],
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::ATTR_PERSISTENT => false
+            ];
+
+            // Create PDO connection
+            $pdo = new PDO($dsn, $config['username'], $config['password'], $options);
+            
+            // Validate connection
+            $pdo->query('SELECT 1');
+            
+            echo "Connected successfully\n";
             return $pdo;
-        } catch (PDOException $e) {
-            $last_error = $e->getMessage();
-            if ($i < $retries - 1) {
-                sleep($retry_delay);
-                continue;
+            
+        } catch(PDOException $e) {
+            $attempt++;
+            if ($attempt >= $maxRetries) {
+                error_log(sprintf(
+                    "Database connection failed: %s\nTrace: %s", 
+                    $e->getMessage(),
+                    $e->getTraceAsString()
+                ));
+                die("Connection failed after {$maxRetries} attempts. Check error log for details.\n");
             }
-            throw new Exception("Database connection failed after {$retries} attempts: {$last_error}");
+            sleep(2); // Wait before retry
         }
     }
 }
 
-// Usage
-try {
-    $db = connectDB();
-} catch (Exception $e) {
-    header('HTTP/1.1 503 Service Unavailable');
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-}
+connectDB();

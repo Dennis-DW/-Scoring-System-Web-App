@@ -129,7 +129,7 @@ INSERT INTO participants (name, email, registration_number, bio) VALUES
 ('Jane Doe', 'jane@example.com', 'PART002', 'UI/UX Designer specializing in mobile applications'),
 ('Bob Wilson', 'bob@example.com', 'PART003', 'Full-stack developer and tech entrepreneur'),
 ('Alice Brown', 'alice@example.com', 'PART004', 'Data scientist with focus on AI/ML'),
-('Charlie Davis', 'charlie@example.com', 'PART005', 'DevOps engineer and cloud architect');
+('Charlie Davis', 'charlie@example.com', 'PART005', 'DevOps engineer and cloud architect'),
 ('Sarah Chen', 'sarah@example.com', 'PART006', 'Backend developer specializing in distributed systems'),
 ('Mohammed Ahmed', 'mohammed@example.com', 'PART007', 'Mobile app developer with expertise in React Native'),
 ('Elena Rodriguez', 'elena@example.com', 'PART008', 'System architect with focus on scalable solutions'),

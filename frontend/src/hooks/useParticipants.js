@@ -1,6 +1,6 @@
 // New file: hooks/useParticipants.js
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { generateAvatar } from '../utils/avatarUtils';
 
 const processParticipantData = (data) => {
@@ -30,7 +30,7 @@ export const useParticipants = () => {
       setError(null);
       setLoading(true);
       
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_participants.php`);
+      const response = await api.get('/api/get_participants.php');
       const cleanData = processParticipantData(response.data);
 
       if (cleanData.success && cleanData.participants) {

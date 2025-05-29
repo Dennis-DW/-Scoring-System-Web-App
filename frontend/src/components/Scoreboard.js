@@ -1,6 +1,6 @@
 // components/Scoreboard.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 /**
  * Scoreboard Component
@@ -47,7 +47,7 @@ useEffect(() => {
       console.log('Fetching scores...');
       setError(null);
       
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/scores.php`);
+      const response = await api.get('/api/scores.php');
       console.log('Raw response:', response.data);
 
       // Extract JSON from response that contains extra messages
@@ -79,7 +79,7 @@ useEffect(() => {
   };
 
   fetchScores();
-  const interval = setInterval(fetchScores, 5000);
+  const interval = setInterval(fetchScores, 10000);
   return () => clearInterval(interval);
 }, []);
 

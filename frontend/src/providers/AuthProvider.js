@@ -1,19 +1,10 @@
 // providers/AuthProvider.js
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 export const AuthContext = createContext(null);
 
 const STORAGE_KEY = 'auth_state';
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost/scoringsystem/backend';
-
-// Axios instance with interceptors
-const api = axios.create({
-  baseURL: `${API_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
 
 api.interceptors.request.use(
   (config) => {
@@ -34,7 +25,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await api.post('/refresh_token.php', { refreshToken });
+        const response = await api.post('/api/refresh_token.php', { refreshToken });
         const { token } = response.data;
         localStorage.setItem('token', token);
         originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -77,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
   const validateToken = async () => {
     try {
-      const response = await api.get('/validate_token.php');
+      const response = await api.get('/api/validate_token.php');
       setState(prev => ({ ...prev, user: response.data.user }));
     } catch (error) {
       handleLogout();
@@ -87,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (email, password, remember = false) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const response = await api.post('/login.php', { email, password });
+      const response = await api.post('/api/login.php', { email, password });
       const { user, token, refreshToken } = response.data;
 
       const authState = {
@@ -120,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   const handleLogout = async () => {
     try {
       if (state.token) {
-        await api.post('/logout.php');
+        await api.post('/api/logout.php');
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -137,18 +128,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleUpdateProfile = async (userData) => {
-    try {
-      const response = await api.put('/update_profile.php', userData);
-      setState(prev => ({
-        ...prev,
-        user: { ...prev.user, ...response.data.user }
-      }));
-    } catch (error) {
-      throw new Error('Profile update failed');
-    }
-  };
-
+  
   const isAuthenticated = !!state.token && !!state.user;
   const hasRole = (role) => state.user?.roles?.includes(role);
 
@@ -160,8 +140,7 @@ export const AuthProvider = ({ children }) => {
     hasRole,
     login: handleLogin,
     logout: handleLogout,
-    updateProfile: handleUpdateProfile
-  };
+    };
 
   if (state.loading) {
     return (

@@ -1,20 +1,8 @@
 // contexts/AuthContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const AuthContext = createContext(null);
-
-// Get API URL from environment with fallback
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost/scoringsystem/backend';
-
-// Create axios instance
-const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  validateStatus: status => status < 500
-});
 
 api.interceptors.request.use(
   (config) => {
@@ -53,7 +41,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await api.get('/check_auth.php');
+      const response = await api.get('/api/check_auth.php');
       if (response.data.success) {
         setUser(response.data.user);
       } else {
@@ -80,7 +68,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log('Attempting login...');
 
-      const response = await api.post('/login.php', {
+      const response = await api.post('/api/login.php', {
         email,
         password,
         remember
@@ -125,7 +113,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (user) {
-        await api.post('/logout.php');
+        await api.post('/api/logout.php');
       }
     } catch (err) {
       console.error('Logout error:', err);

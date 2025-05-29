@@ -1,7 +1,7 @@
 // components/Overview.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import StatCard from './cards/StatCard';
+import api from '../config/axios';
 
 /**
  * Overview Component
@@ -62,7 +62,7 @@ const fetchStats = async () => {
     console.log('Fetching statistics...');
     setError(null);
     
-    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/get_stats.php`);
+    const response = await api.get('/api/get_stats.php');
     console.log('Raw API response:', response.data);
 
     // Remove "Connected successfully" messages if present

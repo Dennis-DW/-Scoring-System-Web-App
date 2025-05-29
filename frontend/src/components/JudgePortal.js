@@ -18,7 +18,7 @@ function JudgePortal() {
 
   useEffect(() => {
     fetch();
-    const interval = setInterval(fetch, 30000);
+    const interval = setInterval(fetch, 70000);
     return () => clearInterval(interval);
   }, [fetch]);
 
