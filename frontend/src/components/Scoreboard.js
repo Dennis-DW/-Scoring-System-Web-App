@@ -40,48 +40,61 @@ function Scoreboard() {
   const [sortBy, setSortBy] = useState('average_score');
   const [sortOrder, setSortOrder] = useState('desc');
 
-
-useEffect(() => {
-  const fetchScores = async () => {
-    try {
-      console.log('Fetching scores...');
-      setError(null);
-      
-      const response = await api.get('/api/scores.php');
-      console.log('Raw response:', response.data);
-
-      // Extract JSON from response that contains extra messages
-      const jsonStr = response.data.substring(
-        response.data.indexOf('{'),
-        response.data.lastIndexOf('}') + 1
-      );
-      
-      const data = JSON.parse(jsonStr);
-      console.log('Parsed data:', data);
-
-      if (data.success) {
-        setScores(data.scores || []);
-        console.log('Scores set:', data.scores);
-      } else {
-        throw new Error(data.error || 'Failed to fetch scores');
+  useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        console.log('Fetching scores...');
+        setError(null);
+  
+        const response = await api.get('/api/scores.php');
+        console.log('Raw response:', response.data);
+  
+        // Axios automatically parses JSON responses
+        const responseData = response.data;
+        let parsedData;
+  
+        // Check if data is already an object
+        if (typeof responseData === 'string') {
+          // Handle case where response is a string containing JSON
+          try {
+            const jsonStr = responseData.substring(
+              responseData.indexOf('{'),
+              responseData.lastIndexOf('}') + 1
+            );
+            parsedData = JSON.parse(jsonStr);
+          } catch (parseError) {
+            console.error('JSON parsing error:', parseError);
+            throw new Error('Invalid response format');
+          }
+        } else {
+          parsedData = responseData;
+        }
+  
+        console.log('Processed data:', parsedData);
+  
+        if (parsedData.success) {
+          setScores(parsedData.scores || []);
+          console.log('Scores set:', parsedData.scores);
+        } else {
+          throw new Error(parsedData.error || 'Failed to fetch scores');
+        }
+      } catch (error) {
+        console.error('Error details:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        });
+        setError('Failed to fetch scores');
+      } finally {
+        console.log('Fetch operation completed');
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
-      });
-      setError('Failed to fetch scores');
-    } finally {
-      console.log('Fetch operation completed');
-      setLoading(false);
-    }
-  };
-
-  fetchScores();
-  const interval = setInterval(fetchScores, 10000);
-  return () => clearInterval(interval);
-}, []);
+    };
+  
+    fetchScores();
+    const interval = setInterval(fetchScores, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleSort = (field) => {
     if (sortBy === field) {
@@ -95,7 +108,7 @@ useEffect(() => {
   const sortedScores = [...scores].sort((a, b) => {
     const multiplier = sortOrder === 'asc' ? 1 : -1;
     return multiplier * (
-      sortBy === 'average_score' 
+      sortBy === 'average_score'
         ? (b.stats?.average_score || 0) - (a.stats?.average_score || 0)
         : (b.stats?.total_points || 0) - (a.stats?.total_points || 0)
     );
@@ -120,14 +133,14 @@ useEffect(() => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <h2 className="text-3xl font-semibold text-slate-800 mb-6">Public Scoreboard</h2>
-      
+
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-50">
               <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">Rank</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-slate-600">Participant</th>
-              <th 
+              <th
                 className="px-6 py-4 text-left text-sm font-semibold text-slate-600 cursor-pointer hover:bg-slate-100"
                 onClick={() => toggleSort('average_score')}
               >
@@ -136,7 +149,7 @@ useEffect(() => {
                   <span className="ml-2">{sortOrder === 'desc' ? '↓' : '↑'}</span>
                 )}
               </th>
-              <th 
+              <th
                 className="px-6 py-4 text-left text-sm font-semibold text-slate-600 cursor-pointer hover:bg-slate-100"
                 onClick={() => toggleSort('total_points')}
               >
@@ -151,7 +164,7 @@ useEffect(() => {
           </thead>
           <tbody className="divide-y divide-slate-200">
             {sortedScores.map((score, index) => (
-              <tr 
+              <tr
                 key={score.id}
                 className="transition-colors hover:bg-slate-50"
               >
@@ -168,12 +181,11 @@ useEffect(() => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center">
-                    <div 
-                      className={`text-sm font-semibold ${
-                        score.stats.average_score >= 75 ? 'text-green-600' :
-                        score.stats.average_score >= 50 ? 'text-blue-600' :
-                        'text-slate-600'
-                      }`}
+                    <div
+                      className={`text-sm font-semibold ${score.stats.average_score >= 75 ? 'text-green-600' :
+                          score.stats.average_score >= 50 ? 'text-blue-600' :
+                            'text-slate-600'
+                        }`}
                     >
                       {score.stats.average_score.toFixed(1)}
                     </div>
@@ -191,7 +203,7 @@ useEffect(() => {
                   )}
                 </td>
                 <td className="px-6 py-4 text-sm text-slate-600">
-                  {score.stats.last_scored 
+                  {score.stats.last_scored
                     ? new Date(score.stats.last_scored).toLocaleString()
                     : 'Never'
                   }
