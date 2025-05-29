@@ -1,10 +1,27 @@
 
-
 # 🎯 Scoring System Web App
 
 A sleek, real-time web application for managing competition scores, built with a **LAMP stack** (Linux, Apache, MySQL/MariaDB, PHP) and a **React frontend**. Ideal for competitions, tournaments, or events requiring live score tracking.
 
----
+## Live Website
+The application is deployed and accessible at:
+[Scoring_System_Live](https://white-meadow-0c5eba71e.6.azurestaticapps.net)
+
+
+## Key Features
+- Public scoreboard with live updates
+- Judge authentication and scoring interface
+- Sorting by average score or total points
+- Participant management
+- Database-driven with Azure MySQL backend
+
+## Technology Stack
+- **Frontend**: React, Tailwind CSS
+- **Backend**: PHP
+- **Database**: Azure MySQL
+- **Hosting**: Azure Static Web Apps (frontend), Azure App Service (backend)
+- **CI/CD**: GitHub integration
+
 
 ## 📝 Overview
 
@@ -331,21 +348,8 @@ npm test
 
 ## 🌍 Deployment
 
-1. Deploy PHP backend to **\[server placeholder]**
-2. Build frontend:
-
-```bash
-cd frontend
-npm run build
-```
-
-3. Serve frontend via **\[server/CDN placeholder]**
-4. Update **CORS** in `backend/api/config.php`
-
-> ⚠️ No public URL available for local setups.
-
+The system uses Azure's cloud infrastructure for reliable hosting and database services.
 ---
-
-
 ---
+--
 
